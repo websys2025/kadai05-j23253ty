@@ -6,14 +6,27 @@
 <body>
     <h1 id="msg">何かのAPI</h1>
     <form name="apiform"><p>
-        何かのフォーム：<input type="text" name="form_data">
-        <button type="button" id="btn1" onclick="some_api(this.form)">実行</button>
+        <button type="button" id="btn1" onclick="some_api(this.form)">トリビア生成</button>
     </p></form>
     
-    <div id="result"></div>
+    <div id="result">結果はここに表示</div>
     <script>
         async function some_api(myForm) {
             // ここにコードを書く
+            const endpoint = "https://opentdb.com/api.php?amount=10";
+            myForm.form_data.value = await fetch(`${endpoint}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.results && data.results.length > 0) {
+                        return data.results.map(item => item.question).join(", ");
+                    } else {
+                        return "該当するデータが見つかりませんでした。";
+                    }
+                })
+                .catch(error => {
+                    console.error("API呼び出しに失敗しました:", error);
+                    return "API呼び出しに失敗しました。";
+                });
             document.getElementById("result").innerHTML += myForm.form_data.value+"<br />";
             document.apiform.reset();
         }
